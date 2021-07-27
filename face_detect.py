@@ -1,6 +1,5 @@
 # Face Detection
 
-#include <iostream.h>
 
 import numpy as np
 import matplotlib.pyplot as plt
