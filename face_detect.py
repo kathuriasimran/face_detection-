@@ -1,54 +1,41 @@
-import cv2
-import numpy as np 
+# Face Detection
 
-cap=cv2.VideoCapture(0)
+#include <iostream.h>
 
-ret, frame = cap.read()
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2 # ----> opencv
 
-face_casc = cv2.CascadeClassifier('Haarcascades/haarcascade_frontalface_default.xml')
-face_rects = face_casc.detectMultiScale(frame)
+# read an image
+img = plt.imread("/content/drive/MyDrive/Dataset/group.jpg")
 
-face_x, face_y,w,h = tuple(face_rects[0])
-track_window = (face_x, face_y, w, h)
+type(img)
 
-roi = frame[face_y:face_y+h,
-            face_x:face_x+w]
+img.shape
 
-hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-roi_hist = cv2.calcHist([hsv_roi],
-                       [0],
-                       None,
-                       [180],
-                       [0,180])
+img.ndim
 
-cv2.normalize(roi_hist,
-              roi_hist,
-             0,
-             255,
-             cv2.NORM_MINMAX);
-term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10,1)
+plt.imshow(img)
 
+model = cv2.CascadeClassifier("/content/drive/MyDrive/Dataset/haarcascade_frontalface_default.xml")
 
-while True:
-    ret, frame = cap.read()
+all_faces = model.detectMultiScale(img,1.5)
 
-    if ret == True:
-        hsv = cv2.cvtColor(frame,
-                            cv2.COLOR_BGR2HSV)
-        
-        dest = cv2.calcBackProject([hsv],[0],roi_hist,[0,180],1)
+all_faces
 
-        ret , track_window, = cv2.CamShift(dest,track_window,term_crit)
+x, y, w, h = all_faces[0]
 
-        pts = cv2.boxPoints(ret)
-        pts = np.int0(pts)
-        img2 = cv2.polylines(frame,[pts],True,(0,255,0),5)
+print(x)
+print(y)
+print(w)
+print(h)
 
-        cv2.imshow('Cam Shift',img2)
+img = cv2.rectangle(img, (x,y), (x+w, y+h), (255, 255, 0), 3 )
 
-        if cv2.waitKey(50) & 0xFF==27:
-            break
-    else:
-        break
-cap.release()
-cv2.destroyAllWindows()    
+plt.imshow(img)
+
+for ele in all_faces:
+  x,y,w,h = ele
+  img = cv2.rectangle(img, (x,y), (x+w, y+h), (255, 255, 0), 2)
+
+plt.imshow(img)
